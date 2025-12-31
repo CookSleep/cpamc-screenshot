@@ -2,7 +2,7 @@
 // @name         CPAMC 额度截图复制
 // @namespace    https://github.com/CookSleep
 // @homepageURL  https://github.com/CookSleep/cpamc-screenshot
-// @version      1.2.1
+// @version      1.2.2
 // @description  在 CPAMC 配额管理页面添加复制按钮，截图（可选择是否脱敏）后复制到剪贴板
 // @author       Cook Sleep
 // @match        *://*/*
@@ -414,7 +414,7 @@
             font-weight: 500;
             color: var(--cpamc-modal-title);
             box-shadow: var(--cpamc-modal-shadow);
-            z-index: 10001;
+            z-index: 10010;
             transition: top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             white-space: nowrap;
         }
