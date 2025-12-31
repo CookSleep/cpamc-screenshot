@@ -2,7 +2,7 @@
 // @name         CPAMC 额度截图复制
 // @namespace    https://github.com/CookSleep
 // @homepageURL  https://github.com/CookSleep/cpamc-screenshot
-// @version      1.1
+// @version      1.2
 // @description  在 CPAMC 配额管理页面添加复制按钮，截图（可选择是否脱敏）后复制到剪贴板
 // @author       Cook Sleep
 // @match        *://*/*
@@ -529,7 +529,8 @@
 
         try {
             const containerWidth = container.offsetWidth;
-            const scale = containerWidth < MIN_SCREENSHOT_WIDTH ? (MIN_SCREENSHOT_WIDTH / containerWidth) * 2 : 2;
+            const targetWidth = isMobile ? MIN_SCREENSHOT_WIDTH * 1.2 : MIN_SCREENSHOT_WIDTH;
+            const scale = containerWidth < targetWidth ? (targetWidth / containerWidth) * 2 : 2;
             const bgColor = getBackgroundColor();
 
             const canvas = await html2canvas(container, {
@@ -537,7 +538,7 @@
                 scale: scale,
                 logging: false,
                 useCORS: true,
-                windowWidth: Math.max(containerWidth, MIN_SCREENSHOT_WIDTH)
+                windowWidth: Math.max(containerWidth, targetWidth)
             });
 
             canvas.toBlob(async (blob) => {
@@ -550,10 +551,18 @@
                                 title: 'CPAMC 额度截图',
                             });
                             showToast(hideEmails ? '截图已触发分享（已隐藏邮箱）' : '截图已触发分享（显示邮箱）', 'success');
-                        } else {
+                        } else if (typeof ClipboardItem !== 'undefined') {
                             const item = new ClipboardItem({ "image/png": blob });
                             await navigator.clipboard.write([item]);
                             showToast(hideEmails ? '截图已复制（已隐藏邮箱）' : '截图已复制（显示邮箱）', 'success');
+                        } else {
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `cpamc-screenshot-${new Date().getTime()}.png`;
+                            a.click();
+                            URL.revokeObjectURL(url);
+                            showToast(hideEmails ? '截图已下载（已隐藏邮箱）' : '截图已下载（显示邮箱）', 'success');
                         }
                     } catch (err) {
                         console.error('Share/Clipboard API failed:', err);
