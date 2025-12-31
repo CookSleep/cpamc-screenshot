@@ -2,7 +2,7 @@
 // @name         CPAMC 额度截图复制
 // @namespace    https://github.com/CookSleep
 // @homepageURL  https://github.com/CookSleep/cpamc-screenshot
-// @version      1.0
+// @version      1.1
 // @description  在 CPAMC 配额管理页面添加复制按钮，截图（可选择是否脱敏）后复制到剪贴板
 // @author       Cook Sleep
 // @match        *://*/*
@@ -475,6 +475,8 @@
         const container = document.querySelector('.QuotaPage-module__container___CkTNE');
         if (!container) return;
 
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
         const hiddenElements = [];
         const cards = container.querySelectorAll('.card');
         const fileNameElements = container.querySelectorAll('.QuotaPage-module__fileName___ATlvN');
@@ -541,12 +543,23 @@
             canvas.toBlob(async (blob) => {
                 if (blob) {
                     try {
-                        const item = new ClipboardItem({ "image/png": blob });
-                        await navigator.clipboard.write([item]);
-                        showToast(hideEmails ? '截图已复制（已隐藏邮箱）' : '截图已复制（显示邮箱）', 'success');
+                        if (isMobile && navigator.share) {
+                            const file = new File([blob], `cpamc-screenshot-${new Date().getTime()}.png`, { type: 'image/png' });
+                            await navigator.share({
+                                files: [file],
+                                title: 'CPAMC 额度截图',
+                            });
+                            showToast(hideEmails ? '截图已触发分享（已隐藏邮箱）' : '截图已触发分享（显示邮箱）', 'success');
+                        } else {
+                            const item = new ClipboardItem({ "image/png": blob });
+                            await navigator.clipboard.write([item]);
+                            showToast(hideEmails ? '截图已复制（已隐藏邮箱）' : '截图已复制（显示邮箱）', 'success');
+                        }
                     } catch (err) {
-                        console.error('Clipboard API failed:', err);
-                        showToast('复制失败，请重试', 'error');
+                        console.error('Share/Clipboard API failed:', err);
+                        if (err.name !== 'AbortError') {
+                            showToast('操作失败，请重试', 'error');
+                        }
                     }
                 }
             }, 'image/png');
