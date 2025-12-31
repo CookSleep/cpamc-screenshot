@@ -1,6 +1,6 @@
 # CPAMC 额度截图复制
 
-![Version](https://img.shields.io/badge/version-1.2-blue) ![License](https://img.shields.io/badge/license-GPLv3-brightgreen)
+![Version](https://img.shields.io/badge/version-1.2.1-blue) ![License](https://img.shields.io/badge/license-GPLv3-brightgreen)
 
 为 [CPAMC](https://github.com/router-for-me/CLIProxyAPI) 配额管理页面添加 **一键截图复制/分享** 功能，支持 **移动端适配**、**脱敏**、**非安全上下文降级**、**多地址配置**，方便快速分享配额状态。
 
@@ -13,7 +13,7 @@
 - **跨端适配与降级逻辑**：
   - **移动端**：智能触发系统 **分享 API**，一键发送截图给好友或保存到相册。
   - **PC 端**：在 HTTPS 或 localhost 环境下，自动复制高清截图到剪贴板。
-  - **非安全上下文降级**：在 HTTP 非本地环境下（如内网 IP 访问），由于浏览器安全限制无法使用剪贴板 API，脚本会自动改为 **下载图片文件**，确保功能始终可用。
+  - **非安全上下文降级**：在 HTTP 非本地环境下（如内网 IP 访问），由于浏览器安全限制无法使用剪贴板 API，脚本会自动弹出 **截图预览窗口**，提示用户右键手动复制，确保功能始终可用。
 - **自动清理**：截图时会自动移除页面上的按钮、描述文字、刷新链接以及无认证的空卡片，确保画面纯净。
 
 ### 2. ⚙️ 多控制台支持

@@ -2,7 +2,7 @@
 // @name         CPAMC 额度截图复制
 // @namespace    https://github.com/CookSleep
 // @homepageURL  https://github.com/CookSleep/cpamc-screenshot
-// @version      1.2
+// @version      1.2.1
 // @description  在 CPAMC 配额管理页面添加复制按钮，截图（可选择是否脱敏）后复制到剪贴板
 // @author       Cook Sleep
 // @match        *://*/*
@@ -296,6 +296,86 @@
             color: var(--cpamc-hint-color);
         }
 
+        .cpamc-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10002;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .cpamc-preview-content {
+            background: var(--cpamc-modal-bg);
+            border: 1px solid var(--cpamc-modal-border);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: var(--cpamc-modal-shadow);
+            position: relative;
+        }
+
+        .cpamc-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--cpamc-modal-title);
+        }
+
+        .cpamc-preview-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .cpamc-preview-img-container {
+            overflow: auto;
+            border-radius: 8px;
+            border: 1px solid var(--cpamc-modal-border);
+            background: var(--cpamc-screenshot-bg);
+        }
+
+        .cpamc-preview-img-container img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .cpamc-preview-hint {
+            font-size: 13px;
+            color: var(--cpamc-primary);
+            text-align: center;
+            background: var(--cpamc-primary-bg);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .cpamc-preview-close {
+            background: transparent;
+            border: none;
+            color: var(--cpamc-modal-label);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .cpamc-preview-close:hover {
+            color: #F56C6C;
+        }
+
         .cpamc-btn-group {
             display: flex;
             gap: 4px;
@@ -444,6 +524,34 @@
 
     GM_registerMenuCommand('⚙️ 设置 CPAMC 地址', showSettingsModal);
 
+    function showPreviewModal(blob) {
+        injectStyles();
+        const url = URL.createObjectURL(blob);
+        const modal = document.createElement('div');
+        modal.className = 'cpamc-preview-modal';
+        modal.innerHTML = `
+            <div class="cpamc-preview-content">
+                <div class="cpamc-preview-header">
+                    <h3>截图预览</h3>
+                    <button class="cpamc-preview-close">${ICONS.CLOSE}</button>
+                </div>
+                <div class="cpamc-preview-hint">由于浏览器安全限制，请右键点击图片选择“复制图像”</div>
+                <div class="cpamc-preview-img-container">
+                    <img src="${url}" alt="screenshot preview">
+                </div>
+            </div>
+        `;
+
+        const closeModal = () => {
+            modal.remove();
+            URL.revokeObjectURL(url);
+        };
+
+        modal.querySelector('.cpamc-preview-close').onclick = closeModal;
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+        document.body.appendChild(modal);
+    }
+
     function showToast(message, type = 'success') {
         const existing = document.querySelector('.cpamc-toast');
         if (existing) existing.remove();
@@ -556,13 +664,8 @@
                             await navigator.clipboard.write([item]);
                             showToast(hideEmails ? '截图已复制（已隐藏邮箱）' : '截图已复制（显示邮箱）', 'success');
                         } else {
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `cpamc-screenshot-${new Date().getTime()}.png`;
-                            a.click();
-                            URL.revokeObjectURL(url);
-                            showToast(hideEmails ? '截图已下载（已隐藏邮箱）' : '截图已下载（显示邮箱）', 'success');
+                            showPreviewModal(blob);
+                            showToast('请在预览窗中手动复制', 'success');
                         }
                     } catch (err) {
                         console.error('Share/Clipboard API failed:', err);
