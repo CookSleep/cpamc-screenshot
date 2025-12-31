@@ -1,15 +1,18 @@
 # CPAMC 额度截图复制
 
-![Version](https://img.shields.io/badge/version-1.0-blue) ![License](https://img.shields.io/badge/license-GPLv3-brightgreen)
+![Version](https://img.shields.io/badge/version-1.1-blue) ![License](https://img.shields.io/badge/license-GPLv3-brightgreen)
 
-为 [CPAMC](https://github.com/router-for-me/CLIProxyAPI) 配额管理页面添加 **一键截图复制** 功能，支持 **脱敏**、**多地址配置**，方便快速分享配额状态。
+为 [CPAMC](https://github.com/router-for-me/CLIProxyAPI) 配额管理页面添加 **一键截图复制/分享** 功能，支持 **移动端适配**、**脱敏**、**多地址配置**，方便快速分享配额状态。
 
 ## ✨ 功能特性
 
-### 1. 📸 一键截图复制
+### 1. 📸 一键截图复制/分享
 - **双模式支持**：
   - **`M` (Mail)**：点击圆角方形 `M` 按钮，截取包含邮箱等完整信息的配额图。
   - **`Copy` (Hidden)**：点击纯复制图标按钮，自动隐藏邮箱文件名，仅保留配额数值，保护隐私。
+- **跨端适配**：
+  - **PC 端**：自动复制高清截图到剪贴板。
+  - **移动端**：智能触发系统 **分享 API**，一键发送截图给好友或保存到相册。
 - **自动清理**：截图时会自动移除页面上的按钮、描述文字、刷新链接以及无认证的空卡片，确保画面纯净。
 
 ### 2. ⚙️ 多控制台支持
