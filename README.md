@@ -23,9 +23,9 @@
 
 ## 📸 效果预览
 
-<img width="315" height="175" alt="image" src="https://github.com/user-attachments/assets/10c79f91-61fb-4a05-b856-f245d5493e44" />
+<img width="302" height="117" alt="image" src="https://github.com/user-attachments/assets/87bdc69d-063b-4928-9095-5ff84808db27" />
 
-<img width="2896" height="2570" alt="image" src="https://github.com/user-attachments/assets/d68dd970-3efb-48ba-8b21-625ef9777bb5" />
+<img width="2896" height="2570" alt="image" src="https://github.com/user-attachments/assets/53c2e49c-1fae-44fd-b2b0-f78efaf4f3d4" />
 
 ## 🚀 安装方法
 
@@ -53,3 +53,4 @@
 ## 🤝 贡献
 
 欢迎提交 Issue 或 Pull Request 来改进代码！
+
