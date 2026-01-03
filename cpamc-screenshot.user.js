@@ -2,7 +2,7 @@
 // @name         CPAMC 额度截图复制
 // @namespace    https://github.com/CookSleep
 // @homepageURL  https://github.com/CookSleep/cpamc-screenshot
-// @version      1.2.3
+// @version      1.2.4
 // @description  在 CPAMC 配额管理页面添加复制按钮，截图（可选择是否脱敏）后复制到剪贴板
 // @author       Cook Sleep
 // @match        *://*/*
@@ -17,8 +17,11 @@
 
 /**
  * 更新说明
+ * 
+ * v1.2.4 (2026-01-03)
+ * - 修改了按钮布局
  *
- * v1.23 (2026-01-03)
+ * v1.2.3 (2026-01-03)
  * - 默认地址改为 http://localhost:8317
  * - 支持了新版页面
  * - 兼容旧版页面
@@ -638,7 +641,10 @@
         });
 
         const btnGroup = document.querySelector('.cpamc-btn-group');
-        if (btnGroup) btnGroup.style.visibility = 'hidden';
+        if (btnGroup) {
+            hiddenElements.push({ el: btnGroup, originalDisplay: btnGroup.style.display });
+            btnGroup.style.display = 'none';
+        }
 
         // 临时给容器添加 padding 以确保截图有边距
         const originalPadding = container.style.padding;
@@ -690,7 +696,6 @@
         } finally {
             // 恢复容器原始 padding
             container.style.padding = originalPadding;
-            if (btnGroup) btnGroup.style.visibility = 'visible';
             hiddenElements.forEach(({ el, originalDisplay, originalVisibility }) => {
                 if (originalDisplay !== undefined) el.style.display = originalDisplay;
                 if (originalVisibility !== undefined) el.style.visibility = originalVisibility;
@@ -701,42 +706,32 @@
     function createCopyButtons() {
         if (document.querySelector('.cpamc-btn-group')) return;
 
-        // 优先查找页面头部的 headerActions（旧版结构）
-        let pageHeaderActions = document.querySelector('.QuotaPage-module__pageHeader___7RVAE .QuotaPage-module__headerActions___Jfu3A');
-        const pageHeader = document.querySelector('.QuotaPage-module__pageHeader___7RVAE');
+        // 使用前缀匹配，避免后缀哈希变化导致失效
+        const pageTitle = document.querySelector('[class^="QuotaPage-module__pageTitle"]');
+        if (!pageTitle) return;
 
-        // 如果页面头部没有 headerActions，则创建一个（新版结构）
-        if (!pageHeaderActions && pageHeader) {
-            pageHeaderActions = document.createElement('div');
-            pageHeaderActions.className = 'QuotaPage-module__headerActions___Jfu3A cpamc-created-actions';
-            pageHeaderActions.style.cssText = 'display: flex; gap: 8px; align-items: center;';
-            pageHeader.appendChild(pageHeaderActions);
-            // 让页面头部变成 flex 布局以便按钮靠右
-            pageHeader.style.cssText = 'display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px;';
-        }
-
-        if (!pageHeaderActions) return;
+        // 让标题变成 flex 布局以便对齐
+        pageTitle.style.cssText = 'display: flex; align-items: center; gap: 12px;';
 
         const btnGroup = document.createElement('div');
         btnGroup.className = 'cpamc-btn-group';
+        btnGroup.style.cssText = 'display: flex; gap: 4px;';
 
         const btnVisible = document.createElement('button');
         btnVisible.className = 'btn btn-secondary btn-sm cpamc-screenshot-btn';
-        btnVisible.style.marginRight = '4px';
         btnVisible.innerHTML = ICONS.VISIBLE;
         btnVisible.title = '复制截图（显示邮箱）';
         btnVisible.onclick = () => captureScreenshot(false);
 
         const btnHidden = document.createElement('button');
         btnHidden.className = 'btn btn-secondary btn-sm';
-        btnHidden.style.marginRight = '8px';
         btnHidden.innerHTML = ICONS.COPY;
         btnHidden.title = '复制截图（隐藏邮箱）';
         btnHidden.onclick = () => captureScreenshot(true);
 
         btnGroup.appendChild(btnVisible);
         btnGroup.appendChild(btnHidden);
-        pageHeaderActions.insertBefore(btnGroup, pageHeaderActions.firstChild);
+        pageTitle.appendChild(btnGroup);
     }
 
     function init() {
