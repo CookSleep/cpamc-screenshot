@@ -2,7 +2,7 @@
 // @name         CPAMC 额度截图复制
 // @namespace    https://github.com/CookSleep
 // @homepageURL  https://github.com/CookSleep/cpamc-screenshot
-// @version      1.2.2
+// @version      1.2.3
 // @description  在 CPAMC 配额管理页面添加复制按钮，截图（可选择是否脱敏）后复制到剪贴板
 // @author       Cook Sleep
 // @match        *://*/*
@@ -15,11 +15,20 @@
 // @require      https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
 // ==/UserScript==
 
+/**
+ * 更新说明
+ *
+ * v1.23 (2026-01-03)
+ * - 默认地址改为 http://localhost:8317
+ * - 支持了新版页面
+ * - 兼容旧版页面
+ */
+
 (function() {
     'use strict';
 
     const STORAGE_KEY = 'cpamc_urls';
-    const DEFAULT_URL = 'http://127.0.0.1:8317';
+    const DEFAULT_URL = 'http://localhost:8317';
     const MIN_SCREENSHOT_WIDTH = 1200;
 
     const ICONS = {
@@ -690,8 +699,23 @@
     }
 
     function createCopyButtons() {
-        const pageHeaderActions = document.querySelector('.QuotaPage-module__pageHeader___7RVAE .QuotaPage-module__headerActions___Jfu3A');
-        if (!pageHeaderActions || document.querySelector('.cpamc-btn-group')) return;
+        if (document.querySelector('.cpamc-btn-group')) return;
+
+        // 优先查找页面头部的 headerActions（旧版结构）
+        let pageHeaderActions = document.querySelector('.QuotaPage-module__pageHeader___7RVAE .QuotaPage-module__headerActions___Jfu3A');
+        const pageHeader = document.querySelector('.QuotaPage-module__pageHeader___7RVAE');
+
+        // 如果页面头部没有 headerActions，则创建一个（新版结构）
+        if (!pageHeaderActions && pageHeader) {
+            pageHeaderActions = document.createElement('div');
+            pageHeaderActions.className = 'QuotaPage-module__headerActions___Jfu3A cpamc-created-actions';
+            pageHeaderActions.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+            pageHeader.appendChild(pageHeaderActions);
+            // 让页面头部变成 flex 布局以便按钮靠右
+            pageHeader.style.cssText = 'display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px;';
+        }
+
+        if (!pageHeaderActions) return;
 
         const btnGroup = document.createElement('div');
         btnGroup.className = 'cpamc-btn-group';
